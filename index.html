@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe Game - खट्टा जीरो</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        #status {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .cell {
+            background: white;
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        .cell.x {
+            color: #ff4757;
+        }
+
+        .cell.o {
+            color: #2ed573;
+        }
+
+        #restartBtn {
+            margin-top: 20px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            background-color: #ffa502;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+
+        #restartBtn:hover {
+            background-color: #ff7f00;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Tic Tac Toe (खट्टा जीरो)</h1>
+    <div id="status">Khiladi X ki baari hai</div>
+
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button id="restartBtn" onclick="resetGame()">Game Reset Karein</button>
+
+    <script>
+        const board = document.getElementById('board');
+        const statusText = document.getElementById('status');
+        const cells = document.querySelectorAll('.cell');
+
+        let options = ["", "", "", "", "", "", "", "", ""];
+        let currentPlayer = "X";
+        let isRunning = true;
+
+        const winConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        initializeGame();
+
+        function initializeGame() {
+            cells.forEach(cell => cell.addEventListener('click', cellClicked));
+        }
+
+        function cellClicked() {
+            const index = this.getAttribute('data-index');
+
+            if (options[index] !== "" || !isRunning) {
+                return;
+            }
+
+            updateCell(this, index);
+            checkWinner();
+        }
+
+        function updateCell(cell, index) {
+            options[index] = currentPlayer;
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+        }
+
+        function changePlayer() {
+            currentPlayer = (currentPlayer === "X") ? "O" : "X";
+            statusText.textContent = `Khiladi ${currentPlayer} ki baari hai`;
+        }
+
+        function checkWinner() {
+            let roundWon = false;
+
+            for (let i = 0; i < winConditions.length; i++) {
+                const condition = winConditions[i];
+                const cellA = options[condition[0]];
+                const cellB = options[condition[1]];
+                const cellC = options[condition[2]];
+
+                if (cellA === "" || cellB === "" || cellC === "") {
+                    continue;
+                }
+                if (cellA === cellB && cellB === cellC) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusText.textContent = `Khiladi ${currentPlayer} Jeet Gaya! 🎉`;
+                isRunning = false;
+            } else if (!options.includes("")) {
+                statusText.textContent = `Match Draw Ho Gaya! 🤝`;
+                isRunning = false;
+            } else {
+                changePlayer();
+            }
+        }
+
+        function resetGame() {
+            currentPlayer = "X";
+            options = ["", "", "", "", "", "", "", "", ""];
+            statusText.textContent = `Khiladi ${currentPlayer} ki baari hai`;
+            cells.forEach(cell => {
+                cell.textContent = "";
+                cell.classList.remove('x', 'o');
+            });
+            isRunning = true;
+        }
+    </script>
+</body>
+</html>
