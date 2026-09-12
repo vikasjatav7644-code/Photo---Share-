@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Permission Demo</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:24px;text-align:center;color:#222}
+.card{max-width:520px;margin:auto;background:white;padding:24px;border-radius:18px;box-shadow:0 4px 18px #0001}
+button,label{display:block;width:100%;box-sizing:border-box;margin:12px 0;padding:14px;border:0;border-radius:10px;background:#1769e0;color:white;font-size:16px;cursor:pointer}
+input{display:none}
+video{width:100%;max-height:320px;background:#111;border-radius:12px;margin-top:10px}
+#screen{display:none}
+.note{font-size:14px;color:#666;line-height:1.5}
+#status{margin-top:16px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Permission Demo</h1>
+<p class="note">Camera, gallery और screen sharing केवल आपकी स्पष्ट अनुमति के बाद शुरू होंगे। कोई access छिपकर नहीं लिया जाता।</p>
+
+<button id="cameraBtn">📷 Camera की अनुमति दें</button>
+<video id="camera" autoplay playsinline></video>
+
+<label for="gallery">🖼️ Gallery से फोटो चुनें</label>
+<input id="gallery" type="file" accept="image/*">
+
+<button id="screenBtn">🖥️ Screen Share की अनुमति दें</button>
+<video id="screen" autoplay playsinline></video>
+
+<div id="status">कोई permission अभी नहीं दी गई है।</div>
+</div>
+
+<script>
+const status = document.getElementById('status');
+const camera = document.getElementById('camera');
+const screen = document.getElementById('screen');
+
+document.getElementById('cameraBtn').onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:true});
+    camera.srcObject = stream;
+    status.textContent = 'Camera की अनुमति मिल गई।';
+  } catch(e) {
+    status.textContent = 'Camera की अनुमति नहीं मिली।';
+  }
+};
+
+document.getElementById('gallery').onchange = (e) => {
+  if (e.target.files.length) {
+    status.textContent = 'आपने gallery से एक file चुनी है।';
+  }
+};
+
+document.getElementById('screenBtn').onclick = async () => {
+  try {
+    const stream = await navigator.mediaDevices.getDisplayMedia({video:true});
+    screen.srcObject = stream;
+    screen.style.display = 'block';
+    status.textContent = 'Screen sharing की अनुमति मिल गई।';
+    stream.getVideoTracks()[0].onended = () => {
+      screen.style.display = 'none';
+      status.textContent = 'Screen sharing बंद कर दी गई।';
+    };
+  } catch(e) {
+    status.textContent = 'Screen sharing की अनुमति नहीं मिली।';
+  }
+};
+</script>
+</body>
+</html>
